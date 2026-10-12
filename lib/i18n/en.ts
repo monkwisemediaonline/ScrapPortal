@@ -11,6 +11,7 @@ const en = {
   units: { kg: 'kg', tonne: 'tonne', piece: 'piece' },
   common: {
     save: 'Save',
+    saved: 'Saved',
     cancel: 'Cancel',
     back: 'Back',
     optional: 'optional',

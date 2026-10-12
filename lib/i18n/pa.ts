@@ -13,6 +13,7 @@ const pa: Dict = {
   units: { kg: 'ਕਿੱਲੋ', tonne: 'ਟਨ', piece: 'ਪੀਸ' },
   common: {
     save: 'ਸੇਵ ਕਰੋ',
+    saved: 'ਸੇਵ ਹੋ ਗਿਆ',
     cancel: 'ਰੱਦ ਕਰੋ',
     back: 'ਵਾਪਸ',
     optional: 'ਵਿਕਲਪਿਕ',

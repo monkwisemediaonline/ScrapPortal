@@ -32,11 +32,14 @@ export default function ActionForm({
       }}
     >
       {children}
-      {state?.error && <p role="alert" className="text-sm text-down">{state.error}</p>}
-      {state?.ok && <p role="status" className="text-sm text-up">{state.ok}</p>}
-      <button className={submitClass} disabled={pending}>
-        {pending ? '…' : submitLabel}
-      </button>
+      {/* col-span-full keeps the footer on its own row when the form is a grid */}
+      <div className="col-span-full flex flex-wrap items-center gap-3">
+        <button className={submitClass} disabled={pending}>
+          {pending ? '…' : submitLabel}
+        </button>
+        {state?.error && <p role="alert" className="text-sm text-down">{state.error}</p>}
+        {state?.ok && <p role="status" className="text-sm font-medium text-up">{state.ok}</p>}
+      </div>
     </form>
   )
 }

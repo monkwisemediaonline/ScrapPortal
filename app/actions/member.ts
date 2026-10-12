@@ -174,7 +174,7 @@ export async function placeBid(lotId: string, _: ActionState, fd: FormData): Pro
   // Trigger messages (closed lot, below starting rate, own lot) are written for people
   if (error) return { error: error.message.includes('row-level security') ? t.lots.needApprovalBuy : error.message }
   revalidatePath(`/lots/${lotId}`)
-  return { ok: '✓' }
+  return { ok: `✓ ${t.common.saved}` }
 }
 
 export async function withdrawBid(lotId: string) {
@@ -232,5 +232,5 @@ export async function updateDeal(dealId: string, _: ActionState, fd: FormData): 
   const { error } = await supabase.from('deals').update(update).eq('id', dealId)
   if (error) return { error: error.message }
   revalidatePath(`/deals/${dealId}`)
-  return { ok: '✓' }
+  return { ok: `✓ ${t.common.saved}` }
 }

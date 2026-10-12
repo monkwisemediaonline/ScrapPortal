@@ -13,6 +13,7 @@ const hi: Dict = {
   units: { kg: 'किलो', tonne: 'टन', piece: 'पीस' },
   common: {
     save: 'सेव करें',
+    saved: 'सेव हो गया',
     cancel: 'रद्द करें',
     back: 'वापस',
     optional: 'वैकल्पिक',
