@@ -7,6 +7,16 @@ import type { Dict } from '@/lib/i18n/en'
 
 type Mode = 'phone' | 'email'
 
+/** Fails instead of spinning forever if the auth request never comes back. */
+function withTimeout<T>(promise: Promise<T>, ms = 15000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('No response from the login service. Reload the page and try again.')), ms)
+    ),
+  ])
+}
+
 export default function LoginForm({ t, next }: { t: Dict['login']; next: string }) {
   const router = useRouter()
   const [mode, setMode] = useState<Mode>('phone')
@@ -24,15 +34,22 @@ export default function LoginForm({ t, next }: { t: Dict['login']; next: string 
     if (mode === 'phone' && target.length !== 13) return setError('Enter a 10-digit mobile number')
     setBusy(true)
     const supabase = createClient()
-    const { error } = mode === 'phone'
-      ? await supabase.auth.signInWithOtp({ phone: target })
-      : await supabase.auth.signInWithOtp({
-          email: target,
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
-        })
-    setBusy(false)
-    if (error) return setError(error.message)
-    setSentTo(target)
+    try {
+      const { error } = await withTimeout(
+        mode === 'phone'
+          ? supabase.auth.signInWithOtp({ phone: target })
+          : supabase.auth.signInWithOtp({
+              email: target,
+              options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+            })
+      )
+      if (error) return setError(error.message)
+      setSentTo(target)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send. Please try again.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   async function verify(e: React.FormEvent) {
@@ -40,15 +57,22 @@ export default function LoginForm({ t, next }: { t: Dict['login']; next: string 
     setError('')
     setBusy(true)
     const supabase = createClient()
-    const { error } = mode === 'phone'
-      ? await supabase.auth.verifyOtp({ phone: sentTo!, token: code, type: 'sms' })
-      : await supabase.auth.verifyOtp({ email: sentTo!, token: code, type: 'email' })
-    if (error) {
+    try {
+      const { error } = await withTimeout(
+        mode === 'phone'
+          ? supabase.auth.verifyOtp({ phone: sentTo!, token: code, type: 'sms' })
+          : supabase.auth.verifyOtp({ email: sentTo!, token: code, type: 'email' })
+      )
+      if (error) {
+        setBusy(false)
+        return setError(error.message)
+      }
+      router.replace(next)
+      router.refresh()
+    } catch (err) {
       setBusy(false)
-      return setError(error.message)
+      setError(err instanceof Error ? err.message : 'Could not verify. Please try again.')
     }
-    router.replace(next)
-    router.refresh()
   }
 
   if (sentTo) {
