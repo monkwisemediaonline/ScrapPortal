@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --ink: #17191c;
+  --muted: #5d636b;
+  --line: #e2dfd8;
+  --steel: #22272d;
+  --steel-2: #2f363e;
+  --accent: #e2580b;
+  --accent-ink: #ffffff;
+  --accent-soft: #fdeee4;
+  --up: #157a3c;
+  --down: #b42318;
+  --warn-soft: #fff6db;
+  --ok-soft: #e7f5ec;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-steel: var(--steel);
+  --color-steel-2: var(--steel-2);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-warn-soft: var(--warn-soft);
+  --color-ok-soft: var(--ok-soft);
+  --font-sans: var(--font-inter), var(--font-deva), var(--font-guru), system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-deva), var(--font-guru), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
 }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Small shared primitives */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; padding: 0 1.1rem; border-radius: 10px;
+  font-weight: 600; font-size: .95rem; transition: background .15s, opacity .15s;
+  white-space: nowrap; cursor: pointer;
+}
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover:not(:disabled) { background: #c84c08; }
+.btn-dark { background: var(--steel); color: #fff; }
+.btn-dark:hover:not(:disabled) { background: var(--steel-2); }
+.btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+.btn-ghost:hover:not(:disabled) { background: #ecebe6; }
+.btn-sm { min-height: 34px; padding: 0 .75rem; font-size: .85rem; border-radius: 8px; }
+
+.label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .35rem; }
+.hint { font-size: .78rem; color: var(--muted); margin-top: .25rem; }
+.input {
+  width: 100%; min-height: 44px; padding: .55rem .8rem; border-radius: 10px;
+  border: 1px solid var(--line); background: #fff; font-size: 1rem; color: var(--ink);
+}
+.input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+textarea.input { min-height: 88px; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .55rem;
+  border-radius: 999px; font-size: .75rem; font-weight: 600; white-space: nowrap;
+}
+
+.table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.table th { text-align: left; font-weight: 600; color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; padding: .6rem .75rem; border-bottom: 1px solid var(--line); }
+.table td { padding: .7rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table tr:last-child td { border-bottom: 0; }
+
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker-track { animation: ticker 45s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
