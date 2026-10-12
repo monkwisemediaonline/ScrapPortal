@@ -1,8 +1,8 @@
 const TONES = {
   green: 'bg-ok-soft text-up',
-  amber: 'bg-warn-soft text-[#8a5a00]',
+  amber: 'bg-warn-soft text-[#8a6100]',
   red: 'bg-[#fdecea] text-down',
-  grey: 'bg-[#eceae5] text-muted',
+  grey: 'bg-[#e8edf6] text-muted',
   orange: 'bg-accent-soft text-accent',
 }
 

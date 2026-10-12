@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Countdown from '@/components/Countdown'
+import Icon from '@/components/Icon'
 import LotStatus from '@/components/LotStatus'
 import { requireMember, canSell } from '@/lib/auth'
 import { getCatalog, gradeMap } from '@/lib/data'
 import { getDict, localName } from '@/lib/i18n'
 import { num, rupees } from '@/lib/format'
+import { categoryStyle } from '@/lib/tones'
 import type { Lot } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Scrap auctions' }
@@ -39,11 +41,11 @@ export default async function LotsPage({ searchParams }: PageProps<'/lots'>) {
       </div>
 
       <div className="flex gap-2 overflow-x-auto mt-6 pb-1 [scrollbar-width:none]">
-        <Link href="/lots" className={`pill py-1.5 px-3 text-sm ${!activeCat ? 'bg-steel text-white' : 'bg-surface border border-line'}`}>
+        <Link href="/lots" className={`pill py-1.5 px-3 text-sm ${!activeCat ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}>
           {t.common.all}
         </Link>
         {categories.map((c) => (
-          <Link key={c.id} href={`/lots?cat=${c.slug}`} className={`pill py-1.5 px-3 text-sm ${activeCat?.id === c.id ? 'bg-steel text-white' : 'bg-surface border border-line'}`}>
+          <Link key={c.id} href={`/lots?cat=${c.slug}`} className={`pill py-1.5 px-3 text-sm ${activeCat?.id === c.id ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}>
             {localName(c, locale)}
           </Link>
         ))}
@@ -55,12 +57,15 @@ export default async function LotsPage({ searchParams }: PageProps<'/lots'>) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
           {lots.map((l, i) => {
             const s = summaries[i]
+            const style = categoryStyle(categories.find((c) => c.id === g.get(l.grade_id)?.category_id)?.slug)
             return (
-              <Link key={l.id} href={`/lots/${l.id}`} className="card overflow-hidden hover:border-accent flex flex-col">
-                <div className="aspect-[16/9] bg-[#e9e7e1] relative">
-                  {l.photos[0] && (
+              <Link key={l.id} href={`/lots/${l.id}`} className={`tone-${style.tone} card overflow-hidden hover:shadow-md transition-shadow flex flex-col`}>
+                <div className="aspect-[16/9] bg-tone-soft text-tone relative grid place-items-center">
+                  {l.photos[0] ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={l.photos[0]} alt="" className="absolute inset-0 size-full object-cover" />
+                  ) : (
+                    <Icon name={style.icon} size={44} />
                   )}
                   <span className="absolute top-2 left-2"><LotStatus lot={l} t={t} /></span>
                 </div>

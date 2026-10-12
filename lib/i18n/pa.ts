@@ -9,6 +9,9 @@ const pa: Dict = {
     admin: 'ਐਡਮਿਨ',
     login: 'ਲਾਗਇਨ',
     logout: 'ਲਾਗਆਉਟ',
+    home: 'ਹੋਮ',
+    ratesShort: 'ਭਾਅ',
+    sell: 'ਵੇਚੋ',
   },
   units: { kg: 'ਕਿੱਲੋ', tonne: 'ਟਨ', piece: 'ਪੀਸ' },
   common: {

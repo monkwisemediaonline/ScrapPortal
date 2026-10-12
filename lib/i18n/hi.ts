@@ -9,6 +9,9 @@ const hi: Dict = {
     admin: 'एडमिन',
     login: 'लॉगिन',
     logout: 'लॉगआउट',
+    home: 'होम',
+    ratesShort: 'भाव',
+    sell: 'बेचें',
   },
   units: { kg: 'किलो', tonne: 'टन', piece: 'पीस' },
   common: {

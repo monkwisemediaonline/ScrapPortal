@@ -39,7 +39,7 @@ export default async function AdminRequests({ searchParams }: PageProps<'/admin/
       </p>
       <div className="flex gap-1 overflow-x-auto mb-4">
         {FILTERS.map((f) => (
-          <Link key={f} href={`/admin/requests?status=${f}`} className={`pill py-1.5 px-3 text-sm capitalize ${filter === f ? 'bg-steel text-white' : 'bg-surface border border-line'}`}>
+          <Link key={f} href={`/admin/requests?status=${f}`} className={`pill py-1.5 px-3 text-sm capitalize ${filter === f ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}>
             {f}
           </Link>
         ))}

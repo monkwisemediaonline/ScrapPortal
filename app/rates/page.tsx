@@ -18,14 +18,14 @@ export default async function RatesPage({ searchParams }: PageProps<'/rates'>) {
       <p className="text-muted mt-1">{t.rates.sub}</p>
 
       <div className="flex gap-2 overflow-x-auto mt-6 pb-1 [scrollbar-width:none]">
-        <Link href="/rates" className={`pill py-1.5 px-3 text-sm ${!active ? 'bg-steel text-white' : 'bg-surface border border-line'}`}>
+        <Link href="/rates" className={`pill py-1.5 px-3 text-sm ${!active ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}>
           {t.common.all}
         </Link>
         {categories.map((c) => (
           <Link
             key={c.id}
             href={`/rates?cat=${c.slug}`}
-            className={`pill py-1.5 px-3 text-sm ${active?.id === c.id ? 'bg-steel text-white' : 'bg-surface border border-line'}`}
+            className={`pill py-1.5 px-3 text-sm ${active?.id === c.id ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}
           >
             {localName(c, locale)}
           </Link>

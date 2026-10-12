@@ -1,14 +1,26 @@
 import Link from 'next/link'
+import Icon, { type IconName } from '@/components/Icon'
 import RateBoard from '@/components/RateBoard'
 import { getBoard, supabaseConfigured } from '@/lib/data'
 import { getDict, localName } from '@/lib/i18n'
 import { getProfile } from '@/lib/auth'
 import { rupees } from '@/lib/format'
+import { categoryStyle } from '@/lib/tones'
 
 export default async function Home() {
   const [{ t, locale }, { categories, entries }, { profile }] = await Promise.all([getDict(), getBoard(), getProfile()])
   const priced = entries.filter((e) => e.row)
   const sellHref = profile ? '/dashboard' : '/login?mode=signup'
+
+  const methods: { n: string; tone: string; icon: IconName; title: string; body: string }[] = [
+    { n: '01', tone: 'tone-green', icon: 'tag', title: t.home.m1Title, body: t.home.m1Body },
+    { n: '02', tone: 'tone-orange', icon: 'gavel', title: t.home.m2Title, body: t.home.m2Body },
+  ]
+  const trust: { tone: string; icon: IconName; text: string }[] = [
+    { tone: 'tone-blue', icon: 'shield', text: t.home.trust1 },
+    { tone: 'tone-purple', icon: 'lock', text: t.home.trust2 },
+    { tone: 'tone-teal', icon: 'scale', text: t.home.trust3 },
+  ]
 
   return (
     <>
@@ -20,7 +32,7 @@ export default async function Home() {
 
       {/* Live ticker */}
       {priced.length > 0 && (
-        <div className="bg-steel-2 text-white/90 text-sm overflow-hidden border-t border-white/5" aria-label={t.home.boardTitle}>
+        <div className="bg-steel text-white/85 text-sm overflow-hidden" aria-label={t.home.boardTitle}>
           <div className="ticker-track flex w-max">
             {[0, 1].map((copy) => (
               <div key={copy} className="flex" aria-hidden={copy === 1}>
@@ -30,7 +42,7 @@ export default async function Home() {
                     <span key={grade.id} className="px-4 py-2 whitespace-nowrap tabular">
                       {localName(grade, locale)} <b className="text-white">{rupees(row!.best_price)}</b>
                       {diff !== 0 && (
-                        <span className={diff > 0 ? 'text-[#5fd38d]' : 'text-[#ff8a80]'}> {diff > 0 ? '▲' : '▼'}{Math.abs(diff).toFixed(2)}</span>
+                        <span className={diff > 0 ? 'text-[#5fe39a]' : 'text-[#ff8a80]'}> {diff > 0 ? '▲' : '▼'}{Math.abs(diff).toFixed(2)}</span>
                       )}
                     </span>
                   )
@@ -42,28 +54,42 @@ export default async function Home() {
       )}
 
       {/* Hero */}
-      <section className="bg-steel text-white">
-        <div className="mx-auto max-w-6xl px-4 pt-12 pb-16 md:pt-16 md:pb-20 grid md:grid-cols-[1.2fr_1fr] gap-10 items-center">
+      <section className="hero-bg text-white">
+        <div className="mx-auto max-w-6xl px-4 pt-12 pb-20 md:pt-16 md:pb-24 grid md:grid-cols-[1.2fr_1fr] gap-10 items-center">
           <div>
-            <p className="inline-block pill bg-white/10 text-white/90 mb-5">{t.home.badge}</p>
+            <p className="inline-flex items-center gap-2 pill bg-white/15 text-white mb-5 py-1!">
+              <span className="size-2 rounded-full bg-[#5fe39a]" />
+              {t.home.badge}
+            </p>
             <h1 className="font-display font-extrabold text-4xl md:text-5xl leading-[1.08] tracking-tight">{t.home.title}</h1>
-            <p className="mt-5 text-white/75 text-lg max-w-xl">{t.home.sub}</p>
+            <p className="mt-5 text-white/80 text-lg max-w-xl">{t.home.sub}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/rates" className="btn btn-primary">{t.home.ctaRates}</Link>
-              <Link href={sellHref} className="btn bg-white text-steel hover:bg-white/90">{t.home.ctaSell}</Link>
+              <Link href="/rates" className="btn bg-white text-accent hover:bg-white/90">{t.home.ctaRates}</Link>
+              <Link href={sellHref} className="btn btn-success">{t.home.ctaSell}</Link>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-2">
+              {categories.map((c) => {
+                const s = categoryStyle(c.slug)
+                return (
+                  <Link key={c.id} href={`/rates?cat=${c.slug}`} className="flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 pl-2 pr-3 py-1 text-xs font-medium">
+                    <Icon name={s.icon} size={14} />
+                    {localName(c, locale)}
+                  </Link>
+                )
+              })}
             </div>
           </div>
           <div className="grid gap-3">
-            {[
-              { n: '01', title: t.home.m1Title, body: t.home.m1Body },
-              { n: '02', title: t.home.m2Title, body: t.home.m2Body },
-            ].map((m) => (
-              <div key={m.n} className="rounded-xl bg-white/[.06] border border-white/10 p-5">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-display font-extrabold text-accent">{m.n}</span>
-                  <h2 className="font-display font-bold text-lg">{m.title}</h2>
+            {methods.map((m) => (
+              <div key={m.n} className={`${m.tone} rounded-2xl bg-white text-ink p-5 shadow-lg`}>
+                <div className="flex items-center gap-3">
+                  <span className="icon-tile size-11"><Icon name={m.icon} size={22} /></span>
+                  <div>
+                    <span className="text-[11px] font-bold tracking-wider text-tone">{m.n}</span>
+                    <h2 className="font-display font-bold text-lg leading-tight">{m.title}</h2>
+                  </div>
                 </div>
-                <p className="mt-2 text-sm text-white/70 leading-relaxed">{m.body}</p>
+                <p className="mt-3 text-sm text-muted leading-relaxed">{m.body}</p>
               </div>
             ))}
           </div>
@@ -71,8 +97,8 @@ export default async function Home() {
       </section>
 
       {/* Board */}
-      <section className="mx-auto max-w-6xl px-4 -mt-8">
-        <div className="card p-4 md:p-6 shadow-sm">
+      <section className="mx-auto max-w-6xl px-4 -mt-10">
+        <div className="card p-4 md:p-6 shadow-md!">
           <div className="flex flex-wrap items-end justify-between gap-3 mb-5">
             <div>
               <h2 className="font-display font-extrabold text-2xl">{t.home.boardTitle}</h2>
@@ -85,11 +111,11 @@ export default async function Home() {
       </section>
 
       {/* Trust */}
-      <section className="mx-auto max-w-6xl px-4 mt-10 grid sm:grid-cols-3 gap-3">
-        {[t.home.trust1, t.home.trust2, t.home.trust3].map((s) => (
-          <div key={s} className="flex items-center gap-3 card px-4 py-4">
-            <span className="grid place-items-center size-8 rounded-full bg-ok-soft text-up font-bold shrink-0">✓</span>
-            <span className="font-medium text-sm">{s}</span>
+      <section className="mx-auto max-w-6xl px-4 mt-8 grid sm:grid-cols-3 gap-3">
+        {trust.map((s) => (
+          <div key={s.text} className={`${s.tone} flex items-center gap-3 card px-4 py-4`}>
+            <span className="icon-tile size-10"><Icon name={s.icon} size={20} /></span>
+            <span className="font-medium text-sm">{s.text}</span>
           </div>
         ))}
       </section>

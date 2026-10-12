@@ -23,7 +23,7 @@ export default async function AdminMembers({ searchParams }: PageProps<'/admin/m
       <p className="text-sm text-muted mb-4">Verify business details (GSTIN, a call or visit) before approving. Approved sellers can auction lots; approved buyers can bid.</p>
       <div className="flex gap-1 overflow-x-auto mb-4">
         {FILTERS.map((f) => (
-          <Link key={f} href={`/admin/members?status=${f}`} className={`pill py-1.5 px-3 text-sm capitalize ${status === f ? 'bg-steel text-white' : 'bg-surface border border-line'}`}>
+          <Link key={f} href={`/admin/members?status=${f}`} className={`pill py-1.5 px-3 text-sm capitalize ${status === f ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}>
             {f}
           </Link>
         ))}

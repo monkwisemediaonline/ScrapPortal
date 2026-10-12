@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Icon, { type IconName } from '@/components/Icon'
 import StatusPill from '@/components/StatusPill'
 import LotStatus from '@/components/LotStatus'
 import { cancelSellRequest } from '@/app/actions/member'
@@ -56,23 +57,19 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
         </div>
       )}
 
+      {/* Summary tiles */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Stat tone="tone-green" icon="check" label={a.myDeals} value={deals?.length ?? 0} />
+        {seller && <Stat tone="tone-blue" icon="inbox" label={a.mySellRequests} value={requests?.length ?? 0} />}
+        {seller && <Stat tone="tone-orange" icon="gavel" label={a.myLots} value={lots?.length ?? 0} />}
+        {buyer && <Stat tone="tone-purple" icon="tag" label={a.myBids} value={bids?.length ?? 0} />}
+      </div>
+
+      {/* Quick actions */}
       <div className="grid sm:grid-cols-3 gap-3">
-        {seller && (
-          <Link href="/sell" className="card p-4 hover:border-accent">
-            <span className="text-accent font-display font-extrabold">01</span>
-            <span className="block font-semibold mt-1">{a.quickSell}</span>
-          </Link>
-        )}
-        {seller && (
-          <Link href="/lots/new" className="card p-4 hover:border-accent">
-            <span className="text-accent font-display font-extrabold">02</span>
-            <span className="block font-semibold mt-1">{a.newLot}</span>
-          </Link>
-        )}
-        <Link href="/lots" className="card p-4 hover:border-accent">
-          <span className="text-accent font-display font-extrabold">{seller ? '03' : '01'}</span>
-          <span className="block font-semibold mt-1">{a.browseLots}</span>
-        </Link>
+        {seller && <Action href="/sell" tone="tone-green" icon="tag" label={a.quickSell} />}
+        {seller && <Action href="/lots/new" tone="tone-orange" icon="plus" label={a.newLot} />}
+        <Action href="/lots" tone="tone-blue" icon="gavel" label={a.browseLots} />
       </div>
 
       <Section title={a.myDeals} show={!!deals?.length}>
@@ -142,6 +139,28 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
         </Section>
       )}
     </div>
+  )
+}
+
+function Stat({ tone, icon, label, value }: { tone: string; icon: IconName; label: string; value: number }) {
+  return (
+    <div className={`${tone} card p-4 flex items-center gap-3`}>
+      <span className="icon-tile size-11"><Icon name={icon} size={22} /></span>
+      <div className="min-w-0">
+        <p className="font-display font-extrabold text-2xl leading-none tabular">{value}</p>
+        <p className="text-xs text-muted mt-1 truncate">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function Action({ href, tone, icon, label }: { href: string; tone: string; icon: IconName; label: string }) {
+  return (
+    <Link href={href} className={`${tone} card p-4 flex items-center gap-3 border-l-4! border-l-tone! hover:shadow-md transition-shadow`}>
+      <span className="icon-tile size-10"><Icon name={icon} size={20} /></span>
+      <span className="font-semibold flex-1">{label}</span>
+      <span className="text-tone font-bold">→</span>
+    </Link>
   )
 }
 

@@ -7,6 +7,9 @@ const en = {
     admin: 'Admin',
     login: 'Login',
     logout: 'Logout',
+    home: 'Home',
+    ratesShort: 'Rates',
+    sell: 'Sell',
   },
   units: { kg: 'kg', tonne: 'tonne', piece: 'piece' },
   common: {

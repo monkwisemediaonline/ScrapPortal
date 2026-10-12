@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Archivo, Noto_Sans_Devanagari, Noto_Sans_Gurmukhi } from 'next/font/google'
-import Header from '@/components/Header'
+import AppShell from '@/components/AppShell'
 import { APP_NAME, CITY } from '@/lib/config'
 import { getDict } from '@/lib/i18n'
 import './globals.css'
@@ -20,14 +20,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang={locale} className={`${inter.variable} ${archivo.variable} ${deva.variable} ${guru.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-line mt-16">
-          <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-muted flex flex-col sm:flex-row gap-2 justify-between">
-            <span>© {new Date().getFullYear()} {APP_NAME}</span>
-            <span>{CITY}, Punjab</span>
-          </div>
-        </footer>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   )
