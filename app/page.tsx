@@ -8,7 +8,7 @@ import { rupees } from '@/lib/format'
 export default async function Home() {
   const [{ t, locale }, { categories, entries }, { profile }] = await Promise.all([getDict(), getBoard(), getProfile()])
   const priced = entries.filter((e) => e.row)
-  const sellHref = profile ? '/dashboard' : '/login'
+  const sellHref = profile ? '/dashboard' : '/login?mode=signup'
 
   return (
     <>

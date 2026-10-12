@@ -18,10 +18,9 @@ Stack: Next.js 16 (App Router, server actions) · Supabase (Postgres, Auth, Stor
 
 ### 1. Supabase project
 1. Create a project at supabase.com. Pick the **Mumbai (ap-south-1)** region.
-2. In **SQL Editor**, run `supabase/migrations/20261006000000_init.sql`, then `supabase/seed.sql`.
-3. Under **Authentication → Sign In / Providers**:
-   - **Phone** (main login): enable it and connect an SMS provider (Twilio, MessageBird, Vonage or Textlocal). Indian SMS needs DLT registration. Twilio Verify can send the OTP on WhatsApp instead. During development, add **test phone numbers with fixed OTPs** on the same page so you don't need SMS.
-   - **Email** (fallback): enabled by default. Under **Authentication → Email Templates → Magic Link**, add `{{ .Token }}` to the body so users receive a 6-digit code.
+2. In **SQL Editor**, run the files in `supabase/migrations/` in date order, then `supabase/seed.sql`.
+3. Login is **email + password**. Under **Authentication → Sign In / Providers → Email**, turn **Confirm email** off so new members are signed in straight away. If you leave it on, each sign-up waits for a confirmation email, and Supabase's built-in mailer only sends a few per hour.
+4. Under **Authentication → URL Configuration**, set **Site URL** to your live address and add `<address>/**` under **Redirect URLs** (also `http://localhost:3000/**` for local work). Password-reset emails use this.
 
 ### 2. Environment
 ```bash
@@ -36,10 +35,9 @@ npm run dev
 ```
 
 ### 4. Make yourself admin
-Log in once with your phone, then run this in the SQL Editor (phone without `+`):
+Create your account and fill in the business form, then run this in the SQL Editor:
 ```sql
-update profiles set role = 'admin', status = 'approved', full_name = 'Your Name', business_name = 'Ludhiana Scrap Exchange'
-where phone = '91XXXXXXXXXX';
+update profiles set role = 'admin', status = 'approved' where email = 'you@example.com';
 ```
 
 ---

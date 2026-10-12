@@ -24,6 +24,17 @@ export default async function OnboardingPage() {
             <input id="full_name" name="full_name" className="input" required defaultValue={profile.full_name ?? ''} />
           </div>
           <div>
+            <label className="label" htmlFor="phone">{o.phone}</label>
+            <div className="flex">
+              <span className="input w-auto! rounded-r-none border-r-0 bg-bg text-muted grid place-items-center">+91</span>
+              <input
+                id="phone" name="phone" className="input rounded-l-none tabular" inputMode="numeric" autoComplete="tel-national"
+                maxLength={11} required defaultValue={profile.phone?.slice(-10) ?? ''}
+              />
+            </div>
+            <p className="hint">{o.phoneHint}</p>
+          </div>
+          <div>
             <label className="label" htmlFor="business_name">{o.businessName}</label>
             <input id="business_name" name="business_name" className="input" required defaultValue={profile.business_name ?? ''} />
           </div>

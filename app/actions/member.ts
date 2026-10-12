@@ -18,6 +18,8 @@ const photos = (fd: FormData) => fd.getAll('photos').map(String).filter((u) => u
 
 const onboardingSchema = z.object({
   full_name: str(80).min(2),
+  // Stored like Supabase stores phone logins: country code, no plus sign
+  phone: z.string().transform((v) => v.replace(/\D/g, '').slice(-10)).refine((v) => /^[6-9]\d{9}$/.test(v)).transform((v) => '91' + v),
   business_name: str(120).min(2),
   gstin: z.string().trim().toUpperCase().refine((v) => v === '' || GSTIN.test(v), 'Invalid GSTIN'),
   role: z.enum(['seller', 'buyer', 'both']),
@@ -32,8 +34,10 @@ export async function completeOnboarding(_: ActionState, fd: FormData): Promise<
 
   const parsed = onboardingSchema.safeParse(Object.fromEntries(fd))
   if (!parsed.success) {
-    const gstinIssue = parsed.error.issues.find((i) => i.path[0] === 'gstin')
-    return { error: gstinIssue ? `${t.onboarding.gstin}: ${t.onboarding.gstinHint}` : t.common.required }
+    const field = parsed.error.issues[0]?.path[0]
+    if (field === 'gstin') return { error: `${t.onboarding.gstin}: ${t.onboarding.gstinHint}` }
+    if (field === 'phone') return { error: `${t.onboarding.phone}: ${t.onboarding.phoneHint}` }
+    return { error: t.common.required }
   }
   const { error } = await supabase
     .from('profiles')

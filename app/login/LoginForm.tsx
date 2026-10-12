@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient, createEmailLinkClient } from '@/lib/supabase/client'
 import type { Dict } from '@/lib/i18n/en'
 
-type Mode = 'phone' | 'email'
+type Mode = 'signin' | 'signup'
 
 /** Fails instead of spinning forever if the auth request never comes back. */
-function withTimeout<T>(promise: Promise<T>, ms = 15000): Promise<T> {
+function withTimeout<T>(promise: PromiseLike<T>, ms = 15000): Promise<T> {
   return Promise.race([
     promise,
     new Promise<never>((_, reject) =>
@@ -17,134 +16,119 @@ function withTimeout<T>(promise: Promise<T>, ms = 15000): Promise<T> {
   ])
 }
 
-export default function LoginForm({ t, next }: { t: Dict['login']; next: string }) {
-  const router = useRouter()
-  const [mode, setMode] = useState<Mode>('phone')
-  const [value, setValue] = useState('')
-  const [sentTo, setSentTo] = useState<string | null>(null)
-  const [code, setCode] = useState('')
+export default function LoginForm({ t, next, initialMode }: { t: Dict['login']; next: string; initialMode: Mode }) {
+  const [mode, setMode] = useState<Mode>(initialMode)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
 
-  const target = mode === 'phone' ? '+91' + value.replace(/\D/g, '').slice(-10) : value.trim().toLowerCase()
+  const cleanEmail = email.trim().toLowerCase()
+  const confirmUrl = (to: string) => `${window.location.origin}/auth/confirm?next=${encodeURIComponent(to)}`
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault()
+  async function run(fn: () => Promise<void>) {
     setError('')
-    if (mode === 'phone' && target.length !== 13) return setError('Enter a 10-digit mobile number')
+    setNotice('')
     setBusy(true)
-    const supabase = createClient()
     try {
-      const { error } = await withTimeout(
-        mode === 'phone'
-          ? supabase.auth.signInWithOtp({ phone: target })
-          : createEmailLinkClient().auth.signInWithOtp({
-              email: target,
-              options: { emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}` },
-            })
-      )
-      if (error) return setError(error.message)
-      setSentTo(target)
+      await fn()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not send. Please try again.')
+      setError(err instanceof Error ? err.message : 'Please try again.')
     } finally {
       setBusy(false)
     }
   }
 
-  async function verify(e: React.FormEvent) {
+  function submit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
-    setBusy(true)
-    const supabase = createClient()
-    try {
-      const { error } = await withTimeout(
-        mode === 'phone'
-          ? supabase.auth.verifyOtp({ phone: sentTo!, token: code, type: 'sms' })
-          : supabase.auth.verifyOtp({ email: sentTo!, token: code, type: 'email' })
-      )
-      if (error) {
-        setBusy(false)
-        return setError(error.message)
+    run(async () => {
+      if (mode === 'signin') {
+        const { error } = await withTimeout(createClient().auth.signInWithPassword({ email: cleanEmail, password }))
+        if (error) return setError(error.code === 'invalid_credentials' ? t.invalid : error.message)
+        window.location.assign(next)
+        return
       }
-      router.replace(next)
-      router.refresh()
-    } catch (err) {
-      setBusy(false)
-      setError(err instanceof Error ? err.message : 'Could not verify. Please try again.')
-    }
+
+      // Sign up through the link-anywhere client so a confirmation email (if Supabase
+      // requires one) can be opened on any device; see lib/supabase/client.ts.
+      const { data, error } = await withTimeout(
+        createEmailLinkClient().auth.signUp({ email: cleanEmail, password, options: { emailRedirectTo: confirmUrl(next) } })
+      )
+      if (error) return setError(error.code === 'user_already_exists' ? t.exists : error.message)
+      if (data.session) {
+        const { access_token, refresh_token } = data.session
+        await createClient().auth.setSession({ access_token, refresh_token })
+        window.location.assign(next)
+      } else if (data.user && data.user.identities?.length === 0) {
+        // Supabase hides "already registered" behind a fake success when confirmation is on
+        setError(t.exists)
+      } else {
+        setNotice(`${t.confirmSent} ${cleanEmail}`)
+      }
+    })
   }
 
-  if (sentTo) {
-    return (
-      <form onSubmit={verify} className="space-y-4">
-        <p className="text-sm text-muted">
-          {mode === 'email' ? t.linkSent : t.sentTo} <b className="text-ink">{sentTo}</b>{' '}
-          <button type="button" className="text-accent font-semibold" onClick={() => { setSentTo(null); setCode('') }}>
-            {t.change}
-          </button>
-        </p>
-        <div>
-          <label className="label" htmlFor="code">{t.code}</label>
-          <input
-            id="code"
-            className="input tabular tracking-[.4em] text-center text-xl"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            maxLength={6}
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-            autoFocus
-            required
-          />
-        </div>
-        {error && <p role="alert" className="text-sm text-down">{error}</p>}
-        <button className="btn btn-primary w-full" disabled={busy || code.length < 6}>{busy ? '…' : t.verify}</button>
-      </form>
-    )
+  function forgot() {
+    if (!cleanEmail) return setError(t.resetNeedEmail)
+    run(async () => {
+      const { error } = await withTimeout(
+        createEmailLinkClient().auth.resetPasswordForEmail(cleanEmail, { redirectTo: confirmUrl('/reset-password') })
+      )
+      if (error) return setError(error.message)
+      setNotice(`${t.resetSent} ${cleanEmail}`)
+    })
   }
 
+  const signup = mode === 'signup'
   return (
-    <form onSubmit={send} className="space-y-4">
-      <div className="grid grid-cols-2 rounded-lg bg-bg p-1 text-sm font-semibold" role="tablist">
-        {(['phone', 'email'] as Mode[]).map((m) => (
-          <button
-            key={m}
-            type="button"
-            role="tab"
-            aria-selected={mode === m}
-            onClick={() => { setMode(m); setValue(''); setError('') }}
-            className={`py-2 rounded-md ${mode === m ? 'bg-surface shadow-sm' : 'text-muted'}`}
-          >
-            {m === 'phone' ? t.phone : t.email}
-          </button>
-        ))}
-      </div>
-      {mode === 'phone' ? (
-        <div>
-          <label className="label" htmlFor="phone">{t.phoneLabel}</label>
-          <div className="flex">
-            <span className="input w-auto! rounded-r-none border-r-0 bg-bg text-muted grid place-items-center">+91</span>
-            <input
-              id="phone"
-              className="input rounded-l-none tabular"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              placeholder="98765 43210"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-      ) : (
+    <>
+      <h1 className="font-display font-extrabold text-2xl">{signup ? t.titleSignup : t.title}</h1>
+      <p className="text-muted text-sm mt-1 mb-6">{signup ? t.subSignup : t.sub}</p>
+      <form onSubmit={submit} className="space-y-4">
         <div>
           <label className="label" htmlFor="email">{t.emailLabel}</label>
-          <input id="email" type="email" className="input" autoComplete="email" value={value} onChange={(e) => setValue(e.target.value)} required />
+          <input id="email" type="email" className="input" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
-      )}
-      {error && <p role="alert" className="text-sm text-down">{error}</p>}
-      <button className="btn btn-primary w-full" disabled={busy}>{busy ? '…' : t.send}</button>
-    </form>
+        <div>
+          <div className="flex justify-between items-baseline">
+            <label className="label" htmlFor="password">{t.password}</label>
+            {!signup && (
+              <button type="button" onClick={forgot} className="text-xs text-accent font-semibold" disabled={busy}>
+                {t.forgot}
+              </button>
+            )}
+          </div>
+          <input
+            id="password"
+            type="password"
+            className="input"
+            autoComplete={signup ? 'new-password' : 'current-password'}
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {signup && <p className="hint">{t.passwordHint}</p>}
+        </div>
+        {error && <p role="alert" className="text-sm text-down">{error}</p>}
+        {notice && <p role="status" className="rounded-lg bg-ok-soft text-up text-sm p-3">{notice}</p>}
+        <button className="btn btn-primary w-full" disabled={busy}>{busy ? '…' : signup ? t.signUp : t.signIn}</button>
+      </form>
+      <p className="text-sm text-center mt-5">
+        <span className="text-muted">{signup ? t.haveAccount : t.noAccount} </span>
+        <button
+          type="button"
+          className="text-accent font-semibold"
+          onClick={() => {
+            setMode(signup ? 'signin' : 'signup')
+            setError('')
+            setNotice('')
+          }}
+        >
+          {signup ? t.signIn : t.signUp}
+        </button>
+      </p>
+    </>
   )
 }
