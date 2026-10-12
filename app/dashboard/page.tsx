@@ -20,7 +20,7 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
   const [{ data: requests }, { data: lots }, { data: bids }, { data: deals }] = await Promise.all([
     supabase.from('sell_requests').select('*').eq('seller_id', profile.id).order('created_at', { ascending: false }).limit(20),
     supabase.from('lots').select('*').eq('seller_id', profile.id).order('created_at', { ascending: false }).limit(20),
-    supabase.from('bids').select('*, lots(title, status, closes_at)').eq('buyer_id', profile.id).order('updated_at', { ascending: false }).limit(20),
+    supabase.from('bids').select('*, lots!bids_lot_id_fkey(title, status, closes_at)').eq('buyer_id', profile.id).order('updated_at', { ascending: false }).limit(20),
     supabase.from('deals').select('*').or(`seller_id.eq.${profile.id},buyer_id.eq.${profile.id}`).order('created_at', { ascending: false }).limit(20),
   ])
 
@@ -76,7 +76,7 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
       </div>
 
       <Section title={a.myDeals} show={!!deals?.length}>
-        {(deals as Deal[]).map((d) => (
+        {((deals ?? []) as Deal[]).map((d) => (
           <Row key={d.id} href={`/deals/${d.id}`}>
             <span className="flex-1">
               <b>{localName(g.get(d.grade_id), locale)}</b>
@@ -91,7 +91,7 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
 
       {seller && (
         <Section title={a.mySellRequests} show={!!requests?.length}>
-          {(requests as SellRequest[]).map((r) => (
+          {((requests ?? []) as SellRequest[]).map((r) => (
             <div key={r.id} className="flex items-center gap-3 px-4 py-3 border-b border-line last:border-0">
               <span className="flex-1">
                 <b>{localName(g.get(r.grade_id), locale)}</b> · <span className="tabular">{num(r.quantity)} {t.units[r.quantity_unit]}</span>
@@ -116,7 +116,7 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
 
       {seller && (
         <Section title={a.myLots} show={!!lots?.length}>
-          {(lots as Lot[]).map((l) => (
+          {((lots ?? []) as Lot[]).map((l) => (
             <Row key={l.id} href={`/lots/${l.id}`}>
               <span className="flex-1">
                 <b>{l.title}</b>
@@ -130,7 +130,7 @@ export default async function Dashboard({ searchParams }: PageProps<'/dashboard'
 
       {buyer && (
         <Section title={a.myBids} show={!!bids?.length}>
-          {(bids as (Bid & { lots: Pick<Lot, 'title' | 'status' | 'closes_at'> })[]).map((b) => (
+          {((bids ?? []) as (Bid & { lots: Pick<Lot, 'title' | 'status' | 'closes_at'> })[]).map((b) => (
             <Row key={b.id} href={`/lots/${b.lot_id}`}>
               <span className="flex-1">
                 <b>{b.lots?.title}</b>

@@ -26,7 +26,10 @@ export default function LoginForm({ t, next }: { t: Dict['login']; next: string 
     const supabase = createClient()
     const { error } = mode === 'phone'
       ? await supabase.auth.signInWithOtp({ phone: target })
-      : await supabase.auth.signInWithOtp({ email: target })
+      : await supabase.auth.signInWithOtp({
+          email: target,
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+        })
     setBusy(false)
     if (error) return setError(error.message)
     setSentTo(target)
@@ -52,7 +55,7 @@ export default function LoginForm({ t, next }: { t: Dict['login']; next: string 
     return (
       <form onSubmit={verify} className="space-y-4">
         <p className="text-sm text-muted">
-          {t.sentTo} <b className="text-ink">{sentTo}</b>{' '}
+          {mode === 'email' ? t.linkSent : t.sentTo} <b className="text-ink">{sentTo}</b>{' '}
           <button type="button" className="text-accent font-semibold" onClick={() => { setSentTo(null); setCode('') }}>
             {t.change}
           </button>
