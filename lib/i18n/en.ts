@@ -75,8 +75,8 @@ const en = {
     verify: 'Verify & continue',
     change: 'Change',
     sentTo: 'Code sent to',
-    linkSent: 'Open the sign-in link we emailed (in this same browser), or enter the code if your email has one. Sent to',
-    linkError: 'That sign-in link did not work. Open it in the same browser where you asked for it, or request a new one.',
+    linkSent: 'Open the sign-in link we emailed to sign in, or enter the code if your email has one. Sent to',
+    linkError: 'That sign-in link did not work. Links expire quickly and work only once. Please request a new one.',
   },
   onboarding: {
     title: 'Tell us about your business',

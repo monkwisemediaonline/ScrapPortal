@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, createEmailLinkClient } from '@/lib/supabase/client'
 import type { Dict } from '@/lib/i18n/en'
 
 type Mode = 'phone' | 'email'
@@ -38,9 +38,9 @@ export default function LoginForm({ t, next }: { t: Dict['login']; next: string 
       const { error } = await withTimeout(
         mode === 'phone'
           ? supabase.auth.signInWithOtp({ phone: target })
-          : supabase.auth.signInWithOtp({
+          : createEmailLinkClient().auth.signInWithOtp({
               email: target,
-              options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}` },
+              options: { emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}` },
             })
       )
       if (error) return setError(error.message)
