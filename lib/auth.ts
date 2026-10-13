@@ -15,17 +15,28 @@ export const getProfile = cache(async () => {
   }
   const supabase = await createClient()
 
-  // One round trip: the database checks the session token itself and returns the caller's
-  // own row (nothing when signed out). proxy.ts has already refreshed the session.
-  const fast = await supabase.rpc('my_profile').maybeSingle<Profile>()
-  if (!fast.error) return { supabase, profile: fast.data }
+  // Signed out: no cookie, no database call at all.
+  const { data: { session } } = await supabase.auth.getSession()
+  const memberId = session ? tokenSubject(session.access_token) : null
+  if (!memberId) return { supabase, profile: null as Profile | null }
 
-  // my_profile() not installed yet (migration 20261016): the original two-step lookup
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { supabase, profile: null as Profile | null }
-  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single<Profile>()
-  return { supabase, profile: data }
+  // One round trip. The id above is read from the cookie without checking it, so it is only
+  // a hint for which row to ask for: the database verifies the token's signature on this very
+  // request and row-level security returns the row only to its real owner. A forged or
+  // expired token gets an error here, which we treat as signed out.
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', memberId).maybeSingle<Profile>()
+  return { supabase, profile: error ? null : data }
 })
+
+/** The member id ("sub") inside a session token. Decoded only, not verified. */
+function tokenSubject(jwt: string): string | null {
+  try {
+    const sub = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString('utf8')).sub
+    return typeof sub === 'string' && /^[0-9a-f-]{36}$/i.test(sub) ? sub : null
+  } catch {
+    return null
+  }
+}
 
 /** For member pages: must be signed in and have finished onboarding. */
 export async function requireMember() {

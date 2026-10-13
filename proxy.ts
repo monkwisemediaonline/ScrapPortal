@@ -4,7 +4,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 const PROTECTED = ['/dashboard', '/onboarding', '/sell', '/lots', '/deals', '/admin']
 
 // Refreshes the Supabase session cookie and bounces signed-out users from member pages.
-// Role/approval checks happen in each page and server action (see lib/auth.ts).
+//
+// This is only a first, cheap gate. It reads the session from the cookie (and renews it when
+// it is about to expire) without calling the auth server, because it runs on every request,
+// including the dozen-plus link preloads each page triggers. The real checks are not here:
+// every page and server action loads the member through lib/auth.ts, where the database
+// verifies the session token's signature before returning any row (row-level security).
 export async function proxy(request: NextRequest) {
   // Lets the layout know which page is being rendered (see components/AppShell.tsx)
   request.headers.set('x-pathname', request.nextUrl.pathname)
@@ -28,10 +33,10 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
   const { pathname } = request.nextUrl
 
-  if (!user && PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+  if (!session && PROTECTED.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
     const url = new URL('/login', request.url)
     url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
