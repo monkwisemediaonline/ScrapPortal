@@ -25,6 +25,7 @@ export default function MemberHome({
   lots,
   bids,
   sent,
+  listsOnly,
 }: {
   profile: Pick<Profile, 'full_name' | 'business_name' | 'public_code' | 'status' | 'role'>
   t: Dict
@@ -36,6 +37,8 @@ export default function MemberHome({
   lots: Lot[]
   bids: BidWithLot[]
   sent?: boolean
+  /** Admin profile page: show only the trade lists, without the member welcome and buttons */
+  listsOnly?: boolean
 }) {
   const a = t.account
   const sells = profile.role !== 'buyer'
@@ -43,9 +46,9 @@ export default function MemberHome({
   const nothing = !deals.length && !requests.length && !lots.length && !bids.length
 
   return (
-    <div className="mx-auto max-w-5xl px-4 lg:px-6 py-6 space-y-6">
+    <div className={`mx-auto max-w-5xl px-4 lg:px-6 space-y-6 ${listsOnly ? "pb-6" : "py-6"}`}>
       {/* Welcome */}
-      <div className="hero-bg text-white rounded-2xl p-5 md:p-6 flex flex-wrap items-center gap-4 justify-between">
+      {!listsOnly && <div className="hero-bg text-white rounded-2xl p-5 md:p-6 flex flex-wrap items-center gap-4 justify-between">
         <div>
           <h1 className="font-display font-extrabold text-2xl md:text-3xl">
             {a.hello}, {profile.full_name?.split(' ')[0] ?? ''} 👋
@@ -56,10 +59,10 @@ export default function MemberHome({
           </p>
         </div>
         <StatusPill status={profile.status} label={profile.status === 'approved' ? `✓ ${a.approved}` : undefined} />
-      </div>
+      </div>}
 
       {sent && <div className="card bg-ok-soft border-transparent px-4 py-3 font-medium text-up">✓ {t.sell.sent}</div>}
-      {profile.status === 'pending' && (
+      {!listsOnly && profile.status === 'pending' && (
         <div className="card bg-warn-soft border-transparent px-4 py-3">
           <p className="font-semibold">⏳ {a.pendingTitle}</p>
           <p className="text-sm mt-0.5">{a.pendingBody}</p>
@@ -73,7 +76,7 @@ export default function MemberHome({
       )}
 
       {/* Big buttons */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className={listsOnly ? "hidden" : "grid grid-cols-2 lg:grid-cols-4 gap-3"}>
         {sells && <Big href="/sell" color="grad-green" icon="tag" title={a.bigSell} sub={a.bigSellSub} />}
         <Big href="/rates" color="grad-blue" icon="chart" title={a.bigRates} sub={a.bigRatesSub} />
         {sells && <Big href="/lots/new" color="grad-orange" icon="plus" title={a.bigAuction} sub={a.bigAuctionSub} />}
@@ -81,7 +84,7 @@ export default function MemberHome({
       </div>
 
       {/* Today's rates at a glance */}
-      {topRates.length > 0 && (
+      {!listsOnly && topRates.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-2">
             <h2 className="font-display font-bold text-lg">{a.todayRates}</h2>
@@ -101,7 +104,7 @@ export default function MemberHome({
         </section>
       )}
 
-      {nothing && <p className="card p-6 text-center text-muted">{a.nothingYet}</p>}
+      {nothing && !listsOnly && <p className="card p-6 text-center text-muted">{a.nothingYet}</p>}
 
       <Section tone="tone-green" icon="check" title={a.myDeals} show={deals.length > 0}>
         {deals.map((d) => (

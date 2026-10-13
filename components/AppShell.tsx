@@ -88,7 +88,7 @@ export function MemberShell({
 }) {
   const marketLinks = (
     <>
-      <NavLink href={isAdmin ? '/dashboard?view=me' : '/dashboard'} icon="user" label={t.nav.account} />
+      <NavLink href={isAdmin ? '/dashboard?view=me' : '/dashboard'} icon="user" label={isAdmin ? 'My admin profile' : t.nav.account} />
       <NavLink href="/rates" icon="chart" label={t.nav.rates} />
       <NavLink href="/sell" icon="tag" label={t.account.bigSell} />
       <NavLink href="/lots" icon="gavel" label={t.nav.lots} except="/lots/new" />
@@ -180,7 +180,7 @@ export function MemberShell({
               <NavLink variant="bottom" href="/admin/rates" icon="rupee" label="Rates" />
               <NavLink variant="bottom" href="/admin/requests" icon="inbox" label="Requests" />
               <NavLink variant="bottom" href="/admin/finance" icon="coins" label="Finance" />
-              <NavLink variant="bottom" href="/dashboard?view=me" icon="user" label={t.nav.account} />
+              <NavLink variant="bottom" href="/dashboard?view=me" icon="user" label="Profile" />
             </>
           ) : (
             <>

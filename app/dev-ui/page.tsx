@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { MemberShell } from '@/components/AppShell'
 import AdminOverview from '@/components/AdminOverview'
+import AdminProfile from '@/components/AdminProfile'
 import DealView from '@/components/DealView'
 import FinanceView from '@/components/FinanceView'
 import type { FinanceRow } from '@/lib/finance'
@@ -19,7 +20,7 @@ export default async function DevUi({ searchParams }: PageProps<'/dev-ui'>) {
   const { view: rawView } = await searchParams
   const view = typeof rawView === 'string' ? rawView : 'admin'
   const { t, locale } = await getDict()
-  const admin = view === 'admin' || view === 'deal-admin' || view === 'finance'
+  const admin = ['admin', 'deal-admin', 'finance', 'profile'].includes(view)
   const now = '2026-10-13T09:30:00+05:30'
 
   const grade = { id: 'g1', category_id: 'c1', slug: 'hms-1', name_en: 'HMS-1 (Heavy Melting)', name_hi: 'HMS-1 (भारी मेल्टिंग)', name_pa: 'HMS-1 (ਭਾਰੀ ਮੈਲਟਿੰਗ)', description: null, unit: 'kg', sort: 1, active: true } satisfies Grade
@@ -53,7 +54,14 @@ export default async function DevUi({ searchParams }: PageProps<'/dev-ui'>) {
     fin(4, { status: 'confirmed', invoiceNo: null, weightKg: null, amount: 0, gst: 0, total: 0, fee: 0, paymentRef: null, paidAt: null, paymentConfirmedAt: null }),
   ]
 
-  if (view === 'finance') body = <div className="mx-auto max-w-6xl px-4 lg:px-6 py-6"><FinanceView rows={finRows} range="month" feeRate={0.25} /></div>
+  if (view === 'profile')
+    body = (
+      <AdminProfile
+        profile={{ id: 'a', phone: '919056011120', email: 'admin@example.com', full_name: 'Monk Wise', business_name: 'Monk Wise Media', gstin: null, role: 'admin', status: 'approved', area: 'Ludhiana', address: 'Ludhiana', public_code: 'LSX-1002', admin_note: null, created_at: now }}
+        stats={{ members: 18, deals: 7, feeEarned: '₹726.71' }}
+      />
+    )
+  else if (view === 'finance') body = <div className="mx-auto max-w-6xl px-4 lg:px-6 py-6"><FinanceView rows={finRows} range="month" feeRate={0.25} /></div>
   else if (view === 'sell') body = <SellForm {...formProps} preselected="g1" />
   else if (view === 'lot') body = <LotForm {...formProps} />
   else if (view === 'invoice') body = <div className="px-4 py-6"><InvoiceSheet deal={deal} gradeName={grade.name_en} seller={parties[0]} buyer={parties[1]} /></div>
