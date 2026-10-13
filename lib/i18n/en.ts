@@ -1,5 +1,7 @@
 const en = {
   nav: {
+    account: 'My Account',
+    website: 'Home page',
     rates: "Today's Rates",
     lots: 'Auctions',
     dashboard: 'My Account',
@@ -108,6 +110,17 @@ const en = {
     submit: 'Submit for verification',
   },
   account: {
+    ask: 'What do you want to do today?',
+    bigSell: 'Sell scrap',
+    bigSellSub: 'At today\'s rate',
+    bigAuction: 'Auction my scrap',
+    bigAuctionSub: 'Buyers bid, you choose',
+    bigRates: 'Today\'s rates',
+    bigRatesSub: 'See all scrap rates',
+    bigBid: 'Buy in auctions',
+    bigBidSub: 'See lots and bid',
+    todayRates: 'Today\'s top rates',
+    nothingYet: 'No activity yet. Start with one of the buttons above.',
     hello: 'Hello',
     pendingTitle: 'Verification in progress',
     pendingBody: 'You can already send sell requests at daily rates. Auctions unlock once we verify your business.',

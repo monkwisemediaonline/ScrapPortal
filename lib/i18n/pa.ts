@@ -2,6 +2,8 @@ import type { Dict } from './en'
 
 const pa: Dict = {
   nav: {
+    account: 'ਮੇਰਾ ਖਾਤਾ',
+    website: 'ਹੋਮ ਪੇਜ',
     rates: 'ਅੱਜ ਦਾ ਭਾਅ',
     lots: 'ਨਿਲਾਮੀ',
     dashboard: 'ਮੇਰਾ ਖਾਤਾ',
@@ -110,6 +112,17 @@ const pa: Dict = {
     submit: 'ਵੈਰੀਫਿਕੇਸ਼ਨ ਲਈ ਭੇਜੋ',
   },
   account: {
+    ask: 'ਅੱਜ ਤੁਸੀਂ ਕੀ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?',
+    bigSell: 'ਸਕ੍ਰੈਪ ਵੇਚੋ',
+    bigSellSub: 'ਅੱਜ ਦੇ ਭਾਅ ’ਤੇ',
+    bigAuction: 'ਨਿਲਾਮੀ ਕਰੋ',
+    bigAuctionSub: 'ਖਰੀਦਦਾਰ ਬੋਲੀ ਲਗਾਉਣ, ਤੁਸੀਂ ਚੁਣੋ',
+    bigRates: 'ਅੱਜ ਦਾ ਭਾਅ',
+    bigRatesSub: 'ਸਾਰੇ ਸਕ੍ਰੈਪ ਦੇ ਭਾਅ ਵੇਖੋ',
+    bigBid: 'ਨਿਲਾਮੀ ਵਿੱਚ ਖਰੀਦੋ',
+    bigBidSub: 'ਲਾਟ ਵੇਖੋ ਤੇ ਬੋਲੀ ਲਗਾਓ',
+    todayRates: 'ਅੱਜ ਦੇ ਮੁੱਖ ਭਾਅ',
+    nothingYet: 'ਹਾਲੇ ਕੋਈ ਗਤੀਵਿਧੀ ਨਹੀਂ। ਉੱਪਰਲੇ ਕਿਸੇ ਬਟਨ ਤੋਂ ਸ਼ੁਰੂ ਕਰੋ।',
     hello: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ',
     pendingTitle: 'ਵੈਰੀਫਿਕੇਸ਼ਨ ਚੱਲ ਰਹੀ ਹੈ',
     pendingBody: 'ਤੁਸੀਂ ਹੁਣੇ ਤੋਂ ਰੋਜ਼ਾਨਾ ਭਾਅ ’ਤੇ ਵੇਚਣ ਦੀ ਰਿਕਵੈਸਟ ਭੇਜ ਸਕਦੇ ਹੋ। ਨਿਲਾਮੀ ਵੈਰੀਫਿਕੇਸ਼ਨ ਤੋਂ ਬਾਅਦ ਖੁੱਲ੍ਹੇਗੀ।',

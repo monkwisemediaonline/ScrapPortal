@@ -116,3 +116,24 @@ textarea.input { min-height: 88px; }
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .ticker-track { animation: ticker 45s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+
+/* Sidebars: navy for members, purple for admin */
+.side-member { background: linear-gradient(180deg, #18203a 0%, #1c2f66 100%); }
+.side-admin  { background: linear-gradient(180deg, #2b1b63 0%, #5b21b6 100%); }
+
+/* Solid colour blocks for the big, simple action buttons and admin tiles */
+.grad { background: linear-gradient(135deg, var(--g1), var(--g2)); color: #fff; }
+.grad-green  { --g1: #16b871; --g2: #0a8a63; }
+.grad-blue   { --g1: #4a8bff; --g2: #2456d6; }
+.grad-orange { --g1: #ff9a4a; --g2: #ea5a0c; }
+.grad-purple { --g1: #9a6bff; --g2: #6d28d9; }
+.grad-teal   { --g1: #1fc2c2; --g2: #0b8a8f; }
+.grad-pink   { --g1: #f76a9a; --g2: #d6336c; }
+
+.big-action {
+  display: flex; flex-direction: column; gap: .6rem; padding: 1.1rem; border-radius: 18px; min-height: 9.5rem;
+  box-shadow: 0 6px 16px -6px rgb(24 32 58 / .35); transition: transform .12s, box-shadow .12s;
+}
+.big-action:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -8px rgb(24 32 58 / .45); }
+.big-action:active { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) { .big-action, .big-action:hover { transition: none; transform: none; } }

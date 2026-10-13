@@ -6,6 +6,8 @@ const PROTECTED = ['/dashboard', '/onboarding', '/sell', '/lots', '/deals', '/ad
 // Refreshes the Supabase session cookie and bounces signed-out users from member pages.
 // Role/approval checks happen in each page and server action (see lib/auth.ts).
 export async function proxy(request: NextRequest) {
+  // Lets the layout know which page is being rendered (see components/AppShell.tsx)
+  request.headers.set('x-pathname', request.nextUrl.pathname)
   let response = NextResponse.next({ request })
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return response
 

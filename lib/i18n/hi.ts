@@ -2,6 +2,8 @@ import type { Dict } from './en'
 
 const hi: Dict = {
   nav: {
+    account: 'मेरा खाता',
+    website: 'होम पेज',
     rates: 'आज का भाव',
     lots: 'नीलामी',
     dashboard: 'मेरा खाता',
@@ -110,6 +112,17 @@ const hi: Dict = {
     submit: 'वेरिफिकेशन के लिए भेजें',
   },
   account: {
+    ask: 'आज आप क्या करना चाहते हैं?',
+    bigSell: 'स्क्रैप बेचें',
+    bigSellSub: 'आज के भाव पर',
+    bigAuction: 'नीलामी करें',
+    bigAuctionSub: 'खरीदार बोली लगाएं, आप चुनें',
+    bigRates: 'आज का भाव',
+    bigRatesSub: 'सभी स्क्रैप के भाव देखें',
+    bigBid: 'नीलामी में खरीदें',
+    bigBidSub: 'लॉट देखें और बोली लगाएं',
+    todayRates: 'आज के मुख्य भाव',
+    nothingYet: 'अभी कोई गतिविधि नहीं। ऊपर के किसी बटन से शुरू करें।',
     hello: 'नमस्ते',
     pendingTitle: 'वेरिफिकेशन चल रहा है',
     pendingBody: 'आप अभी से रोज़ के भाव पर बेचने की रिक्वेस्ट भेज सकते हैं। नीलामी वेरिफिकेशन के बाद खुलेगी।',
