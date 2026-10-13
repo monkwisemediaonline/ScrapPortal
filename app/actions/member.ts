@@ -202,6 +202,7 @@ const dealSchema = z.object({
   deduction_amount: z.union([z.literal(''), z.coerce.number().nonnegative()]).optional(),
   deduction_note: str(300).optional(),
   weighbridge_slip: z.string().optional(),
+  buyer_billing: str(600).optional(),
 })
 
 /** Used by the deal's buyer and by admin. RLS + deals_guard keep commercial terms fixed for buyers. */
@@ -228,6 +229,7 @@ export async function updateDeal(dealId: string, _: ActionState, fd: FormData): 
     final_amount: weight === null ? null : Math.round((amountFor(weight, Number(deal.agreed_rate), deal.unit) - deduction) * 100) / 100,
   }
   if (d.weighbridge_slip) update.weighbridge_slip = d.weighbridge_slip
+  if (profile.role === 'admin' && d.buyer_billing !== undefined) update.buyer_billing = d.buyer_billing || null
 
   const { error } = await supabase.from('deals').update(update).eq('id', dealId)
   if (error) return { error: error.message }

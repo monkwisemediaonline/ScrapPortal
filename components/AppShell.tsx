@@ -88,7 +88,6 @@ export function MemberShell({
 }) {
   const marketLinks = (
     <>
-      <NavLink href="/" icon="home" label={t.nav.website} exact />
       <NavLink href={isAdmin ? '/dashboard?view=me' : '/dashboard'} icon="user" label={t.nav.account} />
       <NavLink href="/rates" icon="chart" label={t.nav.rates} />
       <NavLink href="/sell" icon="tag" label={t.account.bigSell} />
@@ -98,8 +97,8 @@ export function MemberShell({
   )
 
   return (
-    <div className="flex-1 lg:grid lg:grid-cols-[16rem_1fr]">
-      <aside className={`hidden lg:flex flex-col text-white sticky top-0 h-screen overflow-y-auto ${isAdmin ? 'side-admin' : 'side-member'}`}>
+    <div className="flex-1 lg:grid lg:grid-cols-[16rem_1fr] print:block!">
+      <aside className={`hidden lg:flex print:hidden! flex-col text-white sticky top-0 h-screen overflow-y-auto ${isAdmin ? 'side-admin' : 'side-member'}`}>
         <div className="px-4 h-16 flex items-center border-b border-white/10 shrink-0">
           <Logo dark href={isAdmin ? '/admin' : '/dashboard'} />
         </div>
@@ -148,7 +147,7 @@ export function MemberShell({
       </aside>
 
       <div className="min-w-0 flex flex-col min-h-screen">
-        <header className="bg-surface border-b border-line sticky top-0 z-30">
+        <header className="bg-surface border-b border-line sticky top-0 z-30 print:hidden">
           <div className="px-4 lg:px-6 h-14 lg:h-16 flex items-center gap-3">
             <div className="lg:hidden"><Logo href={isAdmin ? '/admin' : '/dashboard'} /></div>
             {isAdmin && (
@@ -173,7 +172,7 @@ export function MemberShell({
 
         <main className="flex-1 pb-24 lg:pb-8">{children}</main>
 
-        <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-surface border-t border-line flex shadow-[0_-2px_10px_rgb(24_32_58/0.06)]">
+        <nav className="lg:hidden print:hidden fixed bottom-0 inset-x-0 z-30 bg-surface border-t border-line flex shadow-[0_-2px_10px_rgb(24_32_58/0.06)]">
           {isAdmin ? (
             <>
               <NavLink variant="bottom" href="/admin" icon="gauge" label="Admin" exact />

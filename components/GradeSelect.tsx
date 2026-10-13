@@ -5,26 +5,28 @@ import { useState } from 'react'
 export type GradeOption = { id: string; label: string; unit: string }
 export type GradeGroup = { label: string; grades: GradeOption[] }
 
-/** Grade picker grouped by category; optionally shows today's best rate for the picked grade. */
+/** Grade picker grouped by category; shows today's best rate for the picked grade in large type. */
 export default function GradeSelect({
   groups,
   defaultValue,
   label,
   rates,
   rateLabel,
+  noRateLabel,
 }: {
   groups: GradeGroup[]
   defaultValue?: string
   label: string
   rates?: Record<string, string>
   rateLabel?: string
+  noRateLabel?: string
 }) {
   const [value, setValue] = useState(defaultValue ?? '')
   const rate = rates?.[value]
   return (
     <div>
       <label className="label" htmlFor="grade_id">{label}</label>
-      <select id="grade_id" name="grade_id" className="input" required value={value} onChange={(e) => setValue(e.target.value)}>
+      <select id="grade_id" name="grade_id" className="input min-h-12! font-medium" required value={value} onChange={(e) => setValue(e.target.value)}>
         <option value="" disabled>—</option>
         {groups.map((g) => (
           <optgroup key={g.label} label={g.label}>
@@ -35,10 +37,12 @@ export default function GradeSelect({
         ))}
       </select>
       {rate && (
-        <p className="mt-2 rounded-lg bg-accent-soft px-3 py-2 text-sm">
-          {rateLabel}: <b className="tabular">{rate}</b>
-        </p>
+        <div className="mt-3 rounded-xl bg-ok-soft px-4 py-3 flex items-center justify-between gap-3">
+          <span className="text-sm font-medium">{rateLabel}</span>
+          <b className="font-display font-extrabold text-2xl text-up tabular">{rate}</b>
+        </div>
       )}
+      {value && !rate && noRateLabel && <p className="mt-3 rounded-xl bg-warn-soft px-4 py-3 text-sm">{noRateLabel}</p>}
     </div>
   )
 }

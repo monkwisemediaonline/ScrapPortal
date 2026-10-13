@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Countdown from '@/components/Countdown'
 import Icon from '@/components/Icon'
+import { PageBanner } from '@/components/Blocks'
 import LotStatus from '@/components/LotStatus'
 import { requireMember, canSell } from '@/lib/auth'
 import { getCatalog, gradeMap } from '@/lib/data'
@@ -31,16 +32,22 @@ export default async function LotsPage({ searchParams }: PageProps<'/lots'>) {
   )
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display font-extrabold text-3xl">{t.lots.title}</h1>
-          <p className="text-muted mt-1">{t.lots.sub}</p>
-        </div>
-        {canSell(profile) && <Link href="/lots/new" className="btn btn-primary">{t.lots.newLot}</Link>}
+    <div className="mx-auto max-w-6xl px-4 lg:px-6 py-6">
+      <PageBanner color="grad-purple" icon="gavel" title={t.lots.title} sub={t.lots.sub}>
+        {canSell(profile) && <Link href="/lots/new" className="btn bg-white text-[#6d28d9] hover:bg-white/90">+ {t.lots.newLot}</Link>}
+      </PageBanner>
+
+      {/* How it works, in three pictures */}
+      <div className="grid sm:grid-cols-3 gap-3 mt-4">
+        {([['tone-orange', 'plus', t.lots.how1], ['tone-blue', 'tag', t.lots.how2], ['tone-green', 'check', t.lots.how3]] as const).map(([tone, icon, text], i) => (
+          <div key={text} className={`${tone} card p-3 flex items-center gap-3`}>
+            <span className="icon-tile size-10"><Icon name={icon} size={20} /></span>
+            <span className="text-sm font-medium"><b className="text-tone">{i + 1}.</b> {text}</span>
+          </div>
+        ))}
       </div>
 
-      <div className="flex gap-2 overflow-x-auto mt-6 pb-1 [scrollbar-width:none]">
+      <div className="flex gap-2 overflow-x-auto mt-5 pb-1 [scrollbar-width:none]">
         <Link href="/lots" className={`pill py-1.5 px-3 text-sm ${!activeCat ? 'bg-accent text-white' : 'bg-surface border border-line text-muted hover:text-ink'}`}>
           {t.common.all}
         </Link>
@@ -52,7 +59,12 @@ export default async function LotsPage({ searchParams }: PageProps<'/lots'>) {
       </div>
 
       {lots.length === 0 ? (
-        <div className="card p-10 text-center text-muted mt-5">{t.common.empty}</div>
+        <div className="tone-purple card p-10 text-center mt-5">
+          <span className="icon-tile size-16 mx-auto rounded-2xl!"><Icon name="gavel" size={32} /></span>
+          <p className="font-display font-bold text-lg mt-4">{t.lots.emptyTitle}</p>
+          <p className="text-muted text-sm mt-1">{t.lots.emptySub}</p>
+          {canSell(profile) && <Link href="/lots/new" className="btn btn-primary mt-4">+ {t.lots.newLot}</Link>}
+        </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
           {lots.map((l, i) => {

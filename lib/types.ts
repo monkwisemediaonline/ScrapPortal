@@ -21,7 +21,7 @@ export type Profile = {
 export type Category = { id: string; slug: string; name_en: string; name_hi: string | null; name_pa: string | null; sort: number; active: boolean }
 export type Grade = {
   id: string; category_id: string; slug: string; name_en: string; name_hi: string | null; name_pa: string | null
-  description: string | null; unit: Unit; sort: number; active: boolean
+  description: string | null; unit: Unit; sort: number; active: boolean; hsn_code?: string | null; gst_percent?: number
 }
 export type RateSource = { id: string; public_label: string; location: string | null; buyer_id: string | null; active: boolean }
 export type Rate = { id: string; grade_id: string; source_id: string; price: number; unit: Unit; rate_date: string; note: string | null }
@@ -53,6 +53,9 @@ export type Deal = {
   est_quantity: number | null; quantity_unit: Unit; pickup_address: string | null; pickup_date: string | null
   final_weight_kg: number | null; deduction_amount: number; deduction_note: string | null; final_amount: number | null
   weighbridge_slip: string | null; status: DealStatus; created_at: string; updated_at: string
+  commission_percent: number; commission_amount: number; gst_percent: number | null; hsn_code: string | null
+  invoice_no: string | null; invoice_date: string | null; buyer_billing: string | null
+  payment_ref: string | null; payment_proof: string | null; paid_at: string | null; payment_confirmed_at: string | null
 }
 
 export type ActionState = { error?: string; ok?: string } | undefined
