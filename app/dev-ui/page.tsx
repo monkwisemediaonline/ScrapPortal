@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { MemberShell } from '@/components/AppShell'
 import AdminOverview from '@/components/AdminOverview'
 import DealView from '@/components/DealView'
+import FinanceView from '@/components/FinanceView'
+import type { FinanceRow } from '@/lib/finance'
 import InvoiceSheet from '@/components/InvoiceSheet'
 import MemberHome from '@/components/MemberHome'
 import { LotForm, SellForm } from '@/components/TradeForms'
@@ -17,7 +19,7 @@ export default async function DevUi({ searchParams }: PageProps<'/dev-ui'>) {
   const { view: rawView } = await searchParams
   const view = typeof rawView === 'string' ? rawView : 'admin'
   const { t, locale } = await getDict()
-  const admin = view === 'admin' || view === 'deal-admin'
+  const admin = view === 'admin' || view === 'deal-admin' || view === 'finance'
   const now = '2026-10-13T09:30:00+05:30'
 
   const grade = { id: 'g1', category_id: 'c1', slug: 'hms-1', name_en: 'HMS-1 (Heavy Melting)', name_hi: 'HMS-1 (भारी मेल्टिंग)', name_pa: 'HMS-1 (ਭਾਰੀ ਮੈਲਟਿੰਗ)', description: null, unit: 'kg', sort: 1, active: true } satisfies Grade
@@ -39,7 +41,20 @@ export default async function DevUi({ searchParams }: PageProps<'/dev-ui'>) {
   const formProps = { t, groups, rates: { g1: '₹33.52/kg' }, area: 'Focal Point', address: 'Plot 214, Focal Point Phase 8' }
 
   let body: React.ReactNode
-  if (view === 'sell') body = <SellForm {...formProps} preselected="g1" />
+  const fin = (i: number, over: Partial<FinanceRow>): FinanceRow => ({
+    id: 'f' + i, date: '2026-10-1' + (4 - (i % 3)), invoiceNo: 'LSX/2610/000' + i, origin: i % 2 ? 'auction' : 'rate_card', grade: 'HMS-1 (Heavy Melting)',
+    seller: 'Sharma Forgings', buyer: 'Gill Steel Traders', weightKg: 7950, amount: 265984, gst: 47877.12, total: 313861.12, feePercent: 0.25, fee: 664.96,
+    status: 'completed', paymentRef: 'UTR26101400' + i, paidAt: now, paymentConfirmedAt: now, feeReceivedAt: null, feeRef: null, ...over,
+  })
+  const finRows = [
+    fin(1, { feeReceivedAt: now, feeRef: 'NEFT88213' }),
+    fin(2, { grade: 'Cotton Katran – White', seller: 'Arora Hosiery', buyer: 'Panipat Recyclers', weightKg: 650, amount: 24700, gst: 1235, total: 25935, fee: 61.75 }),
+    fin(3, { status: 'payment_pending', paymentConfirmedAt: null, grade: 'Copper', seller: 'Verma Cables', buyer: 'Off-portal (Brass unit, Jagraon)', weightKg: 310, amount: 230020, gst: 41403.6, total: 271423.6, fee: 575.05 }),
+    fin(4, { status: 'confirmed', invoiceNo: null, weightKg: null, amount: 0, gst: 0, total: 0, fee: 0, paymentRef: null, paidAt: null, paymentConfirmedAt: null }),
+  ]
+
+  if (view === 'finance') body = <div className="mx-auto max-w-6xl px-4 lg:px-6 py-6"><FinanceView rows={finRows} range="month" feeRate={0.25} /></div>
+  else if (view === 'sell') body = <SellForm {...formProps} preselected="g1" />
   else if (view === 'lot') body = <LotForm {...formProps} />
   else if (view === 'invoice') body = <div className="px-4 py-6"><InvoiceSheet deal={deal} gradeName={grade.name_en} seller={parties[0]} buyer={parties[1]} /></div>
   else if (view.startsWith('deal'))

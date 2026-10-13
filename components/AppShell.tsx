@@ -122,6 +122,7 @@ export function MemberShell({
               <NavLink href="/admin/members" icon="users" label="Members" />
               <NavLink href="/admin/lots" icon="gavel" label="Auctions" />
               <NavLink href="/admin/deals" icon="check" label="Deals" />
+              <NavLink href="/admin/finance" icon="coins" label="Finance" />
               <NavLink href="/admin/sources" icon="building" label="Rate sources" />
               <NavLink href="/admin/catalog" icon="grid" label="Scrap catalog" />
               <p className="px-3 pt-5 pb-1 text-[11px] font-semibold uppercase tracking-wider text-white/50">Marketplace</p>
@@ -178,7 +179,7 @@ export function MemberShell({
               <NavLink variant="bottom" href="/admin" icon="gauge" label="Admin" exact />
               <NavLink variant="bottom" href="/admin/rates" icon="rupee" label="Rates" />
               <NavLink variant="bottom" href="/admin/requests" icon="inbox" label="Requests" />
-              <NavLink variant="bottom" href="/admin/deals" icon="check" label="Deals" />
+              <NavLink variant="bottom" href="/admin/finance" icon="coins" label="Finance" />
               <NavLink variant="bottom" href="/dashboard?view=me" icon="user" label={t.nav.account} />
             </>
           ) : (

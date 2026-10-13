@@ -208,3 +208,31 @@ export async function convertRequest(id: string, _: ActionState, fd: FormData): 
   revalidatePath('/admin/requests')
   redirect(`/deals/${deal.id}`)
 }
+
+// ── Finance ──────────────────────────────────────────────────
+
+/** Fee rate applied to deals made from now on. Existing deals keep the rate they were made at. */
+export async function setFeeRate(_: ActionState, fd: FormData): Promise<ActionState> {
+  const { supabase } = await requireAdmin()
+  const value = Number(fd.get('commission_percent'))
+  if (!(value >= 0 && value <= 10)) return { error: 'Enter a rate between 0 and 10' }
+  const { error } = await supabase
+    .from('platform_settings')
+    .upsert({ key: 'commission_percent', value, updated_at: new Date().toISOString() })
+  if (error) return { error: error.message }
+  revalidatePath('/admin/finance')
+  return { ok: `Saved. New deals will be charged ${value}%.` }
+}
+
+export async function markFeeReceived(dealId: string, fd: FormData) {
+  const { supabase } = await requireAdmin()
+  const fee_ref = String(fd.get('fee_ref') ?? '').trim().slice(0, 80) || null
+  await supabase.from('deals').update({ fee_received_at: new Date().toISOString(), fee_ref }).eq('id', dealId)
+  revalidatePath('/admin/finance')
+}
+
+export async function unmarkFeeReceived(dealId: string) {
+  const { supabase } = await requireAdmin()
+  await supabase.from('deals').update({ fee_received_at: null, fee_ref: null }).eq('id', dealId)
+  revalidatePath('/admin/finance')
+}

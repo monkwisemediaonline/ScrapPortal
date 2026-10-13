@@ -56,6 +56,7 @@ export type Deal = {
   commission_percent: number; commission_amount: number; gst_percent: number | null; hsn_code: string | null
   invoice_no: string | null; invoice_date: string | null; buyer_billing: string | null
   payment_ref: string | null; payment_proof: string | null; paid_at: string | null; payment_confirmed_at: string | null
+  fee_received_at: string | null; fee_ref: string | null
 }
 
 export type ActionState = { error?: string; ok?: string } | undefined
